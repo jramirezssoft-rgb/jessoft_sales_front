@@ -1,0 +1,11 @@
+{
+  "title": "Punto de venta",
+  "description": "This web application enables adults to manage a point of sale with features for product management, sales processing, and generating reports.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

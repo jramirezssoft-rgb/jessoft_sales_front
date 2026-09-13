@@ -1,0 +1,186 @@
+import type { Product, Sale } from "./types";
+
+export const INITIAL_PRODUCTS: Product[] = [
+  {
+    id: 1,
+    name: "Coca-Cola 600ml",
+    barcode: "7501055300891",
+    purchasePrice: 12.0,
+    salePrice: 18.5,
+    profitMargin: 54.2,
+  },
+  {
+    id: 2,
+    name: "Agua Natural 1L",
+    barcode: "7501055300892",
+    purchasePrice: 7.5,
+    salePrice: 12.0,
+    profitMargin: 60.0,
+  },
+  {
+    id: 3,
+    name: "Pan Blanco Bimbo",
+    barcode: "7501055300893",
+    purchasePrice: 35.0,
+    salePrice: 45.0,
+    profitMargin: 28.6,
+  },
+  {
+    id: 4,
+    name: "Leche Lala 1L",
+    barcode: "7501055300894",
+    purchasePrice: 22.0,
+    salePrice: 28.5,
+    profitMargin: 29.5,
+  },
+  {
+    id: 5,
+    name: "Jabón Roma 250g",
+    barcode: "7501055300895",
+    purchasePrice: 9.0,
+    salePrice: 14.0,
+    profitMargin: 55.6,
+  },
+  {
+    id: 6,
+    name: "Sabritas Original",
+    barcode: "7501055300896",
+    purchasePrice: 14.0,
+    salePrice: 22.0,
+    profitMargin: 57.1,
+  },
+  {
+    id: 7,
+    name: "Galletas Marinela",
+    barcode: "7501055300897",
+    purchasePrice: 13.0,
+    salePrice: 19.5,
+    profitMargin: 50.0,
+  },
+  {
+    id: 8,
+    name: "Detergente Ariel",
+    barcode: "7501055300898",
+    purchasePrice: 65.0,
+    salePrice: 89.0,
+    profitMargin: 36.9,
+  },
+  {
+    id: 9,
+    name: "Audífonos BT JBL",
+    barcode: "7501055300899",
+    purchasePrice: 350.0,
+    salePrice: 499.0,
+    profitMargin: 42.6,
+  },
+  {
+    id: 10,
+    name: "Pilas AA Duracell x4",
+    barcode: "7501055300900",
+    purchasePrice: 45.0,
+    salePrice: 65.0,
+    profitMargin: 44.4,
+  },
+  {
+    id: 11,
+    name: "Arroz Blanco",
+    barcode: "7501055300901",
+    purchasePrice: 24.0,
+    salePrice: 35.0,
+    profitMargin: 45.8,
+  },
+];
+
+const d = (daysAgo: number) => {
+  const dt = new Date();
+  dt.setDate(dt.getDate() - daysAgo);
+  return dt;
+};
+
+export const INITIAL_SALES: Sale[] = [
+  {
+    id: 1,
+    date: d(6),
+    items: [
+      { product: INITIAL_PRODUCTS[0], qty: 3 },
+      { product: INITIAL_PRODUCTS[2], qty: 1 },
+    ],
+    subtotal: 100.5,
+    total: 100.5,
+    paymentMethod: "Efectivo",
+    amountPaid: 110,
+    change: 9.5,
+  },
+  {
+    id: 2,
+    date: d(5),
+    items: [{ product: INITIAL_PRODUCTS[3], qty: 2 }],
+    subtotal: 57.0,
+    total: 57.0,
+    paymentMethod: "Tarjeta",
+    amountPaid: 57.0,
+    change: 0,
+  },
+  {
+    id: 3,
+    date: d(4),
+    items: [
+      { product: INITIAL_PRODUCTS[5], qty: 4 },
+      { product: INITIAL_PRODUCTS[6], qty: 2 },
+    ],
+    subtotal: 127.0,
+    total: 127.0,
+    paymentMethod: "Efectivo",
+    amountPaid: 150,
+    change: 23,
+  },
+  {
+    id: 4,
+    date: d(3),
+    items: [{ product: INITIAL_PRODUCTS[8], qty: 1 }],
+    subtotal: 499.0,
+    total: 499.0,
+    paymentMethod: "Tarjeta",
+    amountPaid: 499.0,
+    change: 0,
+  },
+  {
+    id: 5,
+    date: d(2),
+    items: [
+      { product: INITIAL_PRODUCTS[1], qty: 5 },
+      { product: INITIAL_PRODUCTS[4], qty: 3 },
+    ],
+    subtotal: 102.0,
+    total: 102.0,
+    paymentMethod: "Transferencia",
+    amountPaid: 102.0,
+    change: 0,
+  },
+  {
+    id: 6,
+    date: d(1),
+    items: [
+      { product: INITIAL_PRODUCTS[0], qty: 2 },
+      { product: INITIAL_PRODUCTS[9], qty: 1 },
+    ],
+    subtotal: 102.0,
+    total: 102.0,
+    paymentMethod: "Efectivo",
+    amountPaid: 110,
+    change: 8,
+  },
+  {
+    id: 7,
+    date: d(0),
+    items: [
+      { product: INITIAL_PRODUCTS[2], qty: 1 },
+      { product: INITIAL_PRODUCTS[3], qty: 1 },
+    ],
+    subtotal: 73.5,
+    total: 73.5,
+    paymentMethod: "Efectivo",
+    amountPaid: 80,
+    change: 6.5,
+  },
+];
