@@ -1,4 +1,9 @@
-import { type InputHTMLAttributes, type ReactNode, useState } from "react";
+import {
+  type InputHTMLAttributes,
+  type ReactNode,
+  type Ref,
+  useState,
+} from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -6,6 +11,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   suffix?: ReactNode;
   error?: string;
   fullWidth?: boolean;
+  inputRef?: Ref<HTMLInputElement>;
 }
 
 export default function Input({
@@ -14,15 +20,30 @@ export default function Input({
   suffix,
   error,
   fullWidth,
+  inputRef,
   style,
   ...rest
 }: InputProps) {
   const [focused, setFocused] = useState(false);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 5, width: fullWidth ? "100%" : undefined }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 5,
+        width: fullWidth ? "100%" : undefined,
+      }}
+    >
       {label && (
-        <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", fontFamily: "var(--font-body)" }}>
+        <label
+          style={{
+            fontSize: 13,
+            fontWeight: 500,
+            color: "var(--foreground)",
+            fontFamily: "var(--font-body)",
+          }}
+        >
           {label}
         </label>
       )}
@@ -38,13 +59,28 @@ export default function Input({
         }}
       >
         {prefix && (
-          <span style={{ display: "flex", alignItems: "center", paddingLeft: 10, color: "var(--muted-foreground)", flexShrink: 0 }}>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 10,
+              color: "var(--muted-foreground)",
+              flexShrink: 0,
+            }}
+          >
             {prefix}
           </span>
         )}
         <input
-          onFocus={(e) => { setFocused(true); rest.onFocus?.(e); }}
-          onBlur={(e) => { setFocused(false); rest.onBlur?.(e); }}
+          ref={inputRef}
+          onFocus={(e) => {
+            setFocused(true);
+            rest.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            rest.onBlur?.(e);
+          }}
           style={{
             flex: 1,
             padding: "9px 12px",
@@ -60,7 +96,15 @@ export default function Input({
           {...rest}
         />
         {suffix && (
-          <span style={{ display: "flex", alignItems: "center", paddingRight: 10, color: "var(--muted-foreground)", flexShrink: 0 }}>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              paddingRight: 10,
+              color: "var(--muted-foreground)",
+              flexShrink: 0,
+            }}
+          >
             {suffix}
           </span>
         )}

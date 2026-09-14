@@ -21,6 +21,8 @@ export default function App() {
     setSidebarOpen(false);
   };
 
+  //ESTE ES UN COMENTARIO DE PRUEBA
+
   const handleSale = (sale: Omit<Sale, "id">) => {
     setSales((ss) => [...ss, { ...sale, id: nextSaleId }]);
     setNextSaleId((n) => n + 1);

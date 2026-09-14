@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { CartItem, Product, Sale } from "../../types";
 import { useProductSearch } from "../../hooks/useProductSearch";
 import { useVentas } from "../../hooks/useVentas";
 import { notify } from "../../lib/Toast";
+import { searchProductos } from "../../services/productos-guardar";
 import { fmt } from "../../utils/format";
 import {
   getMinimumQuantity,
   isMeasuredProduct,
 } from "../../utils/product-measure";
+import { mapProductoBuscado } from "../../utils/product-search-mapper";
 import Button from "../atoms/Button";
 import SearchBar from "../molecules/SearchBar";
 import Cart from "../organisms/Cart";
@@ -24,6 +26,44 @@ export default function SalesPage({ onSale }: SalesPageProps) {
     useState<Product | null>(null);
   const { results, loading, error } = useProductSearch(search);
   const { loading: savingSale, saveVenta } = useVentas();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const focusSearchInput = () => {
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+  };
+
+  useEffect(() => {
+    focusSearchInput();
+  }, []);
+
+  // Escucha global para redirigir la entrada del escáner o teclado al buscador
+  // en caso de que el usuario haya hecho clic fuera del input
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (pendingMeasuredProduct) return;
+
+      const activeEl = document.activeElement;
+      const isInputActive =
+        activeEl instanceof HTMLInputElement ||
+        activeEl instanceof HTMLTextAreaElement ||
+        activeEl instanceof HTMLSelectElement;
+
+      if (
+        !isInputActive &&
+        (e.key.length === 1 || e.key === "Enter") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [pendingMeasuredProduct]);
 
   const addToCart = (product: Product, quantity: number) => {
     setCart((c) => {
@@ -35,6 +75,7 @@ export default function SalesPage({ onSale }: SalesPageProps) {
       return [...c, { product, qty: quantity }];
     });
     setSearch("");
+    focusSearchInput();
   };
 
   const selectProduct = (product: Product) => {
@@ -44,6 +85,58 @@ export default function SalesPage({ onSale }: SalesPageProps) {
     }
 
     addToCart(product, 1);
+  };
+
+  const handleBarcodeSubmit = async (code: string) => {
+    const query = code.trim();
+    if (!query) return;
+
+    // Limpiamos el texto de búsqueda para evitar que parpadeen sugerencias
+    setSearch("");
+
+    // Verificamos si ya está en los resultados cargados
+    let target = results.find(
+      (p) =>
+        p.barcode?.toLowerCase() === query.toLowerCase() ||
+        p.sku?.toLowerCase() === query.toLowerCase() ||
+        p.name.toLowerCase() === query.toLowerCase(),
+    );
+
+    if (!target) {
+      try {
+        const response = await searchProductos(query);
+        if (response && response.length > 0) {
+          const mapped = response.map(mapProductoBuscado);
+          const exact = mapped.find(
+            (p) =>
+              p.barcode?.toLowerCase() === query.toLowerCase() ||
+              p.sku?.toLowerCase() === query.toLowerCase(),
+          );
+          target = exact || mapped[0];
+        }
+      } catch {
+        notify.error("Error al buscar el producto");
+        focusSearchInput();
+        return;
+      }
+    }
+
+    if (target) {
+      selectProduct(target);
+    } else {
+      notify.error(`Producto con código "${query}" no encontrado`);
+    }
+
+    focusSearchInput();
+  };
+
+  const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (search.trim()) {
+        handleBarcodeSubmit(search);
+      }
+    }
   };
 
   const updateQty = (id: number, qty: number) => {
@@ -71,6 +164,7 @@ export default function SalesPage({ onSale }: SalesPageProps) {
       });
       onSale(sale);
       setCart([]);
+      focusSearchInput();
     } catch {
       notify.error("No fue posible registrar la venta");
       throw new Error("No fue posible registrar la venta");
@@ -90,8 +184,11 @@ export default function SalesPage({ onSale }: SalesPageProps) {
         {/* Left: search + results */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <SearchBar
+            inputRef={searchInputRef}
+            autoFocus
             value={search}
             onChange={setSearch}
+            onKeyDown={handleSearchKeyDown}
             placeholder="Buscar producto o escanear código de barras..."
           />
 
@@ -250,8 +347,12 @@ export default function SalesPage({ onSale }: SalesPageProps) {
           onConfirm={(quantity) => {
             addToCart(pendingMeasuredProduct, quantity);
             setPendingMeasuredProduct(null);
+            focusSearchInput();
           }}
-          onCancel={() => setPendingMeasuredProduct(null)}
+          onCancel={() => {
+            setPendingMeasuredProduct(null);
+            focusSearchInput();
+          }}
         />
       )}
     </div>
