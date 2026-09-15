@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { CartItem, Product, Sale } from "../../types";
+import { useCartCheckout } from "../../hooks/useCartCheckout";
 import { useProductSearch } from "../../hooks/useProductSearch";
 import { useVentas } from "../../hooks/useVentas";
 import { notify } from "../../lib/Toast";
@@ -12,7 +13,8 @@ import {
 import { mapProductoBuscado } from "../../utils/product-search-mapper";
 import Button from "../atoms/Button";
 import SearchBar from "../molecules/SearchBar";
-import Cart from "../organisms/Cart";
+import CartItemsCard from "../organisms/CartItemsCard";
+import CartSummaryCard from "../organisms/CartSummaryCard";
 import ProductMeasurementModal from "../organisms/ProductMeasurementModal";
 
 interface SalesPageProps {
@@ -152,7 +154,7 @@ export default function SalesPage({ onSale }: SalesPageProps) {
     });
   };
 
-  const handleCheckout = async (sale: Omit<Sale, "id">) => {
+  const handleSale = async (sale: Omit<Sale, "id">) => {
     try {
       await saveVenta({
         total: sale.total,
@@ -171,6 +173,19 @@ export default function SalesPage({ onSale }: SalesPageProps) {
     }
   };
 
+  const {
+    payMethod,
+    setPayMethod,
+    amountPaid,
+    setAmountPaid,
+    success,
+    subtotal,
+    total,
+    change,
+    canCheckout,
+    handleCheckout,
+  } = useCartCheckout(cart, handleSale);
+
   return (
     <div className="page-content">
       <div style={{ marginBottom: 22 }}>
@@ -181,7 +196,7 @@ export default function SalesPage({ onSale }: SalesPageProps) {
       </div>
 
       <div className="sales-layout">
-        {/* Left: search + results */}
+        {/* Left: search + results + cart items */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <SearchBar
             inputRef={searchInputRef}
@@ -330,14 +345,24 @@ export default function SalesPage({ onSale }: SalesPageProps) {
               Escribe para buscar un producto
             </div>
           )}
+
+          <CartItemsCard cart={cart} onUpdateQty={updateQty} />
         </div>
 
-        {/* Right: cart */}
-        <Cart
-          cart={cart}
-          onUpdateQty={updateQty}
-          onCheckout={handleCheckout}
+        {/* Right: order summary + payment */}
+        <CartSummaryCard
+          cartLength={cart.length}
+          subtotal={subtotal}
+          total={total}
+          payMethod={payMethod}
+          setPayMethod={setPayMethod}
+          amountPaid={amountPaid}
+          setAmountPaid={setAmountPaid}
+          change={change}
+          canCheckout={canCheckout}
+          success={success}
           loading={savingSale}
+          onCheckout={handleCheckout}
         />
       </div>
 
