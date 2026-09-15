@@ -5,7 +5,7 @@ import { useProductSearch } from "../../hooks/useProductSearch";
 import { useVentas } from "../../hooks/useVentas";
 import { notify } from "../../lib/Toast";
 import { searchProductos } from "../../services/productos-guardar";
-import { fmt } from "../../utils/format";
+import { fmt, roundCurrency } from "../../utils/format";
 import {
   getMinimumQuantity,
   isMeasuredProduct,
@@ -161,7 +161,7 @@ export default function SalesPage({ onSale }: SalesPageProps) {
         detalle: sale.items.map(({ product, qty }) => ({
           id_producto: product.id,
           cantidad: qty,
-          subtotal: product.salePrice * qty,
+          subtotal: roundCurrency(product.salePrice * qty),
         })),
       });
       onSale(sale);

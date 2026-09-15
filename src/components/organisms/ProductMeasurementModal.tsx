@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Product } from "../../types";
-import { fmt } from "../../utils/format";
+import { fmt, roundCurrency } from "../../utils/format";
 import Button from "../atoms/Button";
 import Input from "../atoms/Input";
 import Text from "../atoms/Text";
@@ -35,7 +35,9 @@ export default function ProductMeasurementModal({
         : 0;
 
   const hasValidQuantity = Number.isFinite(quantity) && quantity >= 0.001;
-  const subtotal = hasValidQuantity ? product.salePrice * quantity : 0;
+  const subtotal = hasValidQuantity
+    ? roundCurrency(product.salePrice * quantity)
+    : 0;
 
   const footer = (
     <div style={{ display: "flex", gap: 10 }}>

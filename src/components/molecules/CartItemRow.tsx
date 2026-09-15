@@ -1,5 +1,5 @@
 import type { CartItem } from "../../types";
-import { fmt } from "../../utils/format";
+import { fmt, roundCurrency } from "../../utils/format";
 import { isMeasuredProduct } from "../../utils/product-measure";
 import { Icons } from "../atoms/Icon";
 import IconButton from "../atoms/IconButton";
@@ -92,7 +92,7 @@ export default function CartItemRow({ item, onUpdateQty }: CartItemRowProps) {
           color: "var(--primary)",
         }}
       >
-        {fmt(product.salePrice * qty)}
+        {fmt(roundCurrency(product.salePrice * qty))}
       </div>
     </div>
   );

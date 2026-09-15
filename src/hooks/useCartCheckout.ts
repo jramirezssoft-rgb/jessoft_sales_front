@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { CartItem, PaymentMethod, Sale } from "../types";
+import { roundCurrency } from "../utils/format";
 
 export function useCartCheckout(
   cart: CartItem[],
@@ -9,7 +10,9 @@ export function useCartCheckout(
   const [amountPaid, setAmountPaid] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const subtotal = cart.reduce((a, i) => a + i.product.salePrice * i.qty, 0);
+  const subtotal = roundCurrency(
+    cart.reduce((a, i) => a + i.product.salePrice * i.qty, 0),
+  );
   const total = subtotal;
   const paid = parseFloat(amountPaid) || 0;
   const change = Math.max(0, paid - total);
