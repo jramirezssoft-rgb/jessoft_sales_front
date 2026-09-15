@@ -1,4 +1,9 @@
-import { type ReactNode, type SelectHTMLAttributes, useState } from "react";
+import {
+  type ReactNode,
+  type SelectHTMLAttributes,
+  useRef,
+  useState,
+} from "react";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -20,6 +25,7 @@ export default function Select({
   ...rest
 }: SelectProps) {
   const [focused, setFocused] = useState(false);
+  const elementRef = useRef<HTMLSelectElement | null>(null);
 
   return (
     <div
@@ -43,6 +49,10 @@ export default function Select({
         </label>
       )}
       <select
+        ref={elementRef}
+        onMouseEnter={() => {
+          if (!rest.disabled) elementRef.current?.focus();
+        }}
         onFocus={(e) => {
           setFocused(true);
           onFocus?.(e);

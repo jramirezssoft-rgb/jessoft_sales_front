@@ -2,6 +2,7 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
   type Ref,
+  useRef,
   useState,
 } from "react";
 
@@ -27,6 +28,14 @@ export default function Input({
   ...rest
 }: InputProps) {
   const [focused, setFocused] = useState(false);
+  const elementRef = useRef<HTMLInputElement | null>(null);
+
+  const setRefs = (el: HTMLInputElement | null) => {
+    elementRef.current = el;
+    if (typeof inputRef === "function") inputRef(el);
+    else if (inputRef && "current" in inputRef)
+      (inputRef as { current: HTMLInputElement | null }).current = el;
+  };
 
   return (
     <div
@@ -59,6 +68,9 @@ export default function Input({
           transition: "border-color 0.15s",
           overflow: "hidden",
         }}
+        onMouseEnter={() => {
+          if (!rest.disabled && !rest.readOnly) elementRef.current?.focus();
+        }}
       >
         {prefix && (
           <span
@@ -74,7 +86,7 @@ export default function Input({
           </span>
         )}
         <input
-          ref={inputRef}
+          ref={setRefs}
           onFocus={(e) => {
             setFocused(true);
             rest.onFocus?.(e);
