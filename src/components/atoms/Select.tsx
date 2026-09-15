@@ -2,6 +2,7 @@ import { type ReactNode, type SelectHTMLAttributes, useState } from "react";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
+  labelSize?: number;
   error?: string;
   fullWidth?: boolean;
   children: ReactNode;
@@ -9,6 +10,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export default function Select({
   label,
+  labelSize = 13,
   error,
   fullWidth,
   style,
@@ -31,7 +33,7 @@ export default function Select({
       {label && (
         <label
           style={{
-            fontSize: 13,
+            fontSize: labelSize,
             fontWeight: 500,
             color: "var(--foreground)",
             fontFamily: "var(--font-body)",

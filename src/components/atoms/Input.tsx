@@ -7,6 +7,7 @@ import {
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  labelSize?: number;
   prefix?: ReactNode;
   suffix?: ReactNode;
   error?: string;
@@ -16,6 +17,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export default function Input({
   label,
+  labelSize = 13,
   prefix,
   suffix,
   error,
@@ -38,7 +40,7 @@ export default function Input({
       {label && (
         <label
           style={{
-            fontSize: 13,
+            fontSize: labelSize,
             fontWeight: 500,
             color: "var(--foreground)",
             fontFamily: "var(--font-body)",
