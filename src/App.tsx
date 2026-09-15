@@ -26,6 +26,7 @@ export default function App() {
   const handleSale = (sale: Omit<Sale, "id">) => {
     setSales((ss) => [...ss, { ...sale, id: nextSaleId }]);
     setNextSaleId((n) => n + 1);
+    setTimeout(() => setPage("dashboard"), 3000);
   };
 
   return (
