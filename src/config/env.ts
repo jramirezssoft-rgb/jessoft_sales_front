@@ -1,8 +1,4 @@
-const apiUrl = import.meta.env.VITE_API_URL;
-
-if (!apiUrl) {
-  throw new Error("La variable VITE_API_URL no está configurada.");
-}
+const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 export const env = {
   apiUrl: apiUrl.replace(/\/$/, ""),
