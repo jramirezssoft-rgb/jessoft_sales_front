@@ -8,6 +8,7 @@ import ProductForm from "../organisms/ProductForm";
 import Pagination from "../molecules/Pagination";
 import { useUnidadesMedida } from "../../hooks/useUnidadesMedida";
 import { useProductos } from "../../hooks/useProductos";
+import { useProductSearch } from "../../hooks/useProductSearch";
 import { notify } from "../../lib/Toast";
 import type { ProductDraft } from "../../types/product-update";
 import { mapProductUpdate } from "../../utils/product-update-mapper";
@@ -33,16 +34,21 @@ export default function ProductsPage() {
     updateProducto,
     reloadProductos,
   } = useProductos();
+  const {
+    results: searchResults,
+    loading: searchLoading,
+    error: searchError,
+  } = useProductSearch(search);
+  const isSearching = search.trim().length > 0;
+  const displayedProducts = isSearching ? searchResults : remoteProducts;
 
   useEffect(() => {
     if (productsError) notify.error("No fue posible cargar los productos");
   }, [productsError]);
 
-  const filtered = remoteProducts.filter(
-    (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.barcode.includes(search),
-  );
+  useEffect(() => {
+    if (searchError) notify.error(searchError);
+  }, [searchError]);
 
   const closeModal = () => setModal({ open: false });
 
@@ -69,7 +75,6 @@ export default function ProductsPage() {
         porcentaje_ganancia: data.profitMargin,
       });
 
-      await reloadProductos();
       closeModal();
       notify.success("Producto guardado correctamente");
     } catch {
@@ -83,9 +88,11 @@ export default function ProductsPage() {
         <div>
           <h1 className="page-title">Productos</h1>
           <p className="page-subtitle">
-            {productsLoading
-              ? "Cargando productos..."
-              : `${remoteProducts.length} productos en catálogo`}
+            {isSearching && searchLoading
+              ? "Buscando productos..."
+              : productsLoading
+                ? "Cargando productos..."
+                : `${displayedProducts.length} productos en catálogo`}
           </p>
         </div>
         <Button
@@ -105,16 +112,18 @@ export default function ProductsPage() {
       </div>
 
       <ProductTable
-        products={filtered}
+        products={displayedProducts}
         onEdit={(p) => setModal({ open: true, product: p })}
       />
 
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        disabled={productsLoading}
-      />
+      {!isSearching && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          disabled={productsLoading}
+        />
+      )}
 
       {modal.open && (
         <ProductForm

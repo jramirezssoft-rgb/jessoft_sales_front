@@ -68,6 +68,7 @@ export function useProductos(): UseProductosResult {
     try {
       const savedProducto = await saveProducto(producto);
       setData(savedProducto);
+      await reloadProductos();
       return savedProducto;
     } catch (err) {
       const message =
